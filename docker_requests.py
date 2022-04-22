@@ -3,7 +3,6 @@ import json
 
 import requests
 import datetime
-import concurrent
 
 image_list = []
 
@@ -82,13 +81,13 @@ if __name__ == '__main__':
     image_list = [x for x in get_official_base_image_info(start_image_url)]
     with open('offic_image_docker.json', 'w') as f:
         json.dump([], f)
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        _image = executor
-        for num, image in enumerate(image_list):
-            start_tag_url = f'https://hub.docker.com/v2/repositories/library/{image["name"]}/tags'
-            print(num, end='')
-            with open('offic_image_docker.json', 'rb') as f:
-                data = json.load(f)
-                data.append(image)
-                json.dump(data, f)
+    for num, image in enumerate(image_list):
+        start_tag_url = f'https://hub.docker.com/v2/repositories/library/{image["name"]}/tags'
+        inf = get_official_tag_image_info(start_tag_url, image)
+        print(num, end='')
+        with open('offic_image_docker.json', 'r') as f:
+            data = json.load(f)
+        data.append(inf)
+        with open('offic_image_docker.json', 'w') as f:
+            json.dump(data, f)
 
